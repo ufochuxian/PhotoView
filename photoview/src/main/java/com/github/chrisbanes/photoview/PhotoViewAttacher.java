@@ -825,7 +825,7 @@ public class PhotoViewAttacher implements View.OnTouchListener,
             if (mScroller.isFinished()) {
                 return; // remaining post that should not be handled
             }
-            if (mScroller.computeScrollOffset()) {
+            if (!mAllowDragAtMinScale && mScroller.computeScrollOffset()) {
                 final int newX = mScroller.getCurrX();
                 final int newY = mScroller.getCurrY();
                 mSuppMatrix.postTranslate(mCurrentX - newX, mCurrentY - newY);
