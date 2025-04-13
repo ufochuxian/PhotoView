@@ -62,6 +62,8 @@ public class PhotoViewAttacher implements View.OnTouchListener,
 
     private boolean mAllowParentInterceptOnEdge = true;
     private boolean mBlockParentIntercept = false;
+    private boolean mAllowDragAtMinScale = false;
+
 
     private ImageView mImageView;
 
@@ -266,6 +268,11 @@ public class PhotoViewAttacher implements View.OnTouchListener,
         this.mSingleFlingListener = onSingleFlingListener;
     }
 
+    public void setAllowDragAtMinScale(boolean allow) {
+        this.mAllowDragAtMinScale = allow;
+    }
+
+
     @Deprecated
     public boolean isZoomEnabled() {
         return mZoomEnabled;
@@ -355,7 +362,7 @@ public class PhotoViewAttacher implements View.OnTouchListener,
                 case MotionEvent.ACTION_UP:
                     // If the user has zoomed less than min scale, zoom back
                     // to min scale
-                    if (getScale() < mMinScale) {
+                    if (!mAllowDragAtMinScale && getScale() < mMinScale) {
                         RectF rect = getDisplayRect();
                         if (rect != null) {
                             v.post(new AnimatedZoomRunnable(getScale(), mMinScale,
@@ -572,7 +579,9 @@ public class PhotoViewAttacher implements View.OnTouchListener,
      * Helper method that simply checks the Matrix, and then displays the result
      */
     private void checkAndDisplayMatrix() {
-        if (checkMatrixBounds()) {
+        if (!mAllowDragAtMinScale && checkMatrixBounds()) {
+            setImageViewMatrix(getDrawMatrix());
+        } else {
             setImageViewMatrix(getDrawMatrix());
         }
     }
@@ -705,8 +714,16 @@ public class PhotoViewAttacher implements View.OnTouchListener,
         } else {
             mHorizontalScrollEdge = HORIZONTAL_EDGE_NONE;
         }
-        // Finally actually translate the matrix
-        mSuppMatrix.postTranslate(deltaX, deltaY);
+        if(!mAllowDragAtMinScale) {
+            // Finally actually translate the matrix
+            mSuppMatrix.postTranslate(deltaX, deltaY);
+        }
+
+        // ✅ 如果启用最小缩放也允许拖动，不限制拖动边缘
+        if (mAllowDragAtMinScale) {
+            mHorizontalScrollEdge = HORIZONTAL_EDGE_BOTH;
+            mVerticalScrollEdge = VERTICAL_EDGE_BOTH;
+        }
         return true;
     }
 

@@ -8,7 +8,18 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.sdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
+    }
+
+
+    // ✅ 设置输出的 .aar 文件名
+    libraryVariants.configureEach { variant ->
+        if (variant.buildType.name == "release") {
+            variant.outputs.all { output ->
+                def name = "PhotoView-${defaultConfig.versionName}.aar"
+                outputFileName = name
+            }
+        }
     }
 }
 
@@ -24,7 +35,7 @@ afterEvaluate {
 
                 group = 'com.github.chrisbanes'
                 artifactId = 'PhotoView'
-                version = '2.3.0'
+                version = android.defaultConfig.versionName // ✅ 统一读取 version
 
                 // Adds javadocs and sources as separate jars.
                 artifact androidJavadocsJar

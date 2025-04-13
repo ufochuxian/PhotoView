@@ -134,6 +134,7 @@ public class SimpleSampleActivity extends AppCompatActivity {
 
         Drawable bitmap = ContextCompat.getDrawable(this, R.drawable.wallpaper);
         mPhotoView.setImageDrawable(bitmap);
+        mPhotoView.getAttacher().setAllowDragAtMinScale(true);
 
         // Lets attach some listeners, not required though!
         mPhotoView.setOnMatrixChangeListener(new MatrixChangeListener());
